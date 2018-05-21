@@ -7,9 +7,14 @@ GamePlayManager = {
     },
     preload: function () {
         game.load.image("background", "assets/images/background.png");
+        game.load.spritesheet("horse", "assets/images/horse.png", 84, 156, 2);
     },
     create: function () {
         game.add.sprite(0, 0, "background");
+        this.horse = game.add.sprite(0, 0, "horse");
+        this.horse.frame = 1;
+        this.horse.x = game.width/2;
+        this.horse.y = game.height/2;
     },
     update: function () {
         console.log("update");
