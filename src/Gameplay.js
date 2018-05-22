@@ -11,6 +11,7 @@ GamePlayManager = {
     },
     preload: function () {
         game.load.image("background", "assets/images/background.png");
+        game.load.image("explosion", "assets/images/explosion.png");
         game.load.spritesheet("horse", "assets/images/horse.png", 84, 156, 2);
         game.load.spritesheet("diamonds", "assets/images/diamonds.png", 81, 84, 4);
     },
@@ -43,6 +44,22 @@ GamePlayManager = {
                 rectCurrentDiamond = this.getBoundsDiamond(diamond)
             }
         }
+
+        this.explosionGroup = game.add.group();
+
+        for (var i = 0; i < 10; i++) {
+            this.explosion = this.explosionGroup.create(100, 100, "explosion");
+            this.explosion.tweenScale = game.add.tween(this.explosion.scale).to({
+                x: [0.4, 0.8, 0.4],
+                y: [0.4, 0.8, 0.4]
+            }, 600, Phaser.Easing.Exponential.Out, false, 0, 0, false);
+
+            this.explosion.tweenAlpha = game.add.tween(this.explosion).to({
+                alpha: [1, 0.6, 0]
+            }, 600, Phaser.Easing.Exponential.Out, false, 0, 0, false);
+            this.explosion.anchor.setTo(0.5);
+            this.explosion.kill();
+        }
     },
 
     onTap: function () {
@@ -74,20 +91,14 @@ GamePlayManager = {
     },
 
     getBoundsHorse: function () {
-        var x0 = this.horse.x - Math.abs(this.horse.width / 2);
-        var width = this.horse.width;
-        var y0 = this.horse.y - Math.abs(this.horse.height / 2);
+        var x0 = this.horse.x - Math.abs(this.horse.width) / 4;
+        var width = Math.abs(this.horse.width) / 2;
+        var y0 = this.horse.y - this.horse.height / 2;
         var height = this.horse.height;
 
         return new Phaser.Rectangle(x0, y0, width, height);
     },
-    render: function () {
-        game.debug.spriteBounds(this.horse);
 
-        for (var i = 0; i < AMOUNT_DIAMONDS; i++) {
-            game.debug.spriteBounds(this.diamonds[i]);
-        }
-    },
     update: function () {
         if (this.flagFirstMouseDown) {
             var pointerX = game.input.x;
@@ -108,8 +119,18 @@ GamePlayManager = {
             for (var i = 0; i < AMOUNT_DIAMONDS; i++) {
                 var rectHorse = this.getBoundsHorse();
                 var rectDiamond = this.getBoundsDiamond(this.diamonds[i]);
-                if (this.isRectangleOverlapping(rectHorse, rectDiamond)) {
-                    console.log("colision");
+                if (this.diamonds[i].visible == true && this.isRectangleOverlapping(rectHorse, rectDiamond)) {
+                    this.diamonds[i].visible = false;
+                    var explosion = this.explosionGroup.getFirstDead();
+                    if (explosion != null) {
+                        explosion.reset(this.diamonds[i].x, this.diamonds[i].y);
+                        explosion.tweenScale.start();
+                        explosion.tweenAlpha.start();
+
+                        explosion.tweenAlpha.onComplete.add(function (currentTarget, currentTween) {
+                            currentTarget.kill();
+                        }, this);
+                    }
                 }
             }
         }
