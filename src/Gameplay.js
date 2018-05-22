@@ -14,11 +14,17 @@ GamePlayManager = {
     preload: function () {
         game.load.image("background", "assets/images/background.png");
         game.load.image("explosion", "assets/images/explosion.png");
+        game.load.image("shark", "assets/images/shark.png");
+        game.load.image("fishes", "assets/images/fishes.png");
+        game.load.image("mollusk", "assets/images/mollusk.png");
         game.load.spritesheet("horse", "assets/images/horse.png", 84, 156, 2);
         game.load.spritesheet("diamonds", "assets/images/diamonds.png", 81, 84, 4);
     },
     create: function () {
         game.add.sprite(0, 0, "background");
+        this.mollusk = game.add.sprite(500, 150, "mollusk");
+        this.shark = game.add.sprite(500, 20, "shark");
+        this.fishes = game.add.sprite(100, 550, "fishes");
         this.horse = game.add.sprite(0, 0, "horse");
         this.horse.frame = 1;
         this.horse.x = game.width / 2;
@@ -81,8 +87,7 @@ GamePlayManager = {
             if (this.flagFirstMouseDown) {
                 this.totalTime--;
                 this.timerText.text = this.totalTime + "";
-                if(this.totalTime <= 0)
-                {
+                if (this.totalTime <= 0) {
                     game.time.events.remove(this.timerGameOver);
                     this.showFinalMessage("GAME OVER");
                 }
@@ -102,6 +107,7 @@ GamePlayManager = {
     },
 
     showFinalMessage: function (msg) {
+        this.tweenMollusk.stop();
         var bgAlpha = game.add.bitmapData(game.width, game.height);
         bgAlpha.ctx.fillStyle = "#000000";
         bgAlpha.ctx.fillRect(0, 0, game.width, game.height);
@@ -119,6 +125,9 @@ GamePlayManager = {
     },
 
     onTap: function () {
+        if (!this.flagFirstMouseDown) {
+            this.tweenMollusk = game.add.tween(this.mollusk.position).to({ y: -0.001 }, 5800, Phaser.Easing.Cubic.InOut, true, 0, 1000, true).loop(true);
+        }
         this.flagFirstMouseDown = true;
     },
 
@@ -157,6 +166,16 @@ GamePlayManager = {
 
     update: function () {
         if (this.flagFirstMouseDown && !this.endGame) {
+            this.shark.x--;
+            if (this.shark.x < -300) {
+                this.shark.x = 1300;
+            }
+
+            this.fishes.x += 0.3;
+            if (this.fishes.x > 1300) {
+                this.fishes.x = -300;
+            }
+
             var pointerX = game.input.x;
             var pointerY = game.input.y;
 
