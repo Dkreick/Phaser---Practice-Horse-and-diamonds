@@ -9,6 +9,7 @@ GamePlayManager = {
 
         this.flagFirstMouseDown = false;
         this.amountDiamondsCaught = 0;
+        this.endGame = false;
     },
     preload: function () {
         game.load.image("background", "assets/images/background.png");
@@ -71,6 +72,22 @@ GamePlayManager = {
 
         this.scoreText = game.add.text(game.width / 2, 40, "0", style);
         this.scoreText.anchor.setTo(0.5);
+
+        this.totalTime = 30;
+        this.timerText = game.add.text(1000, 40, this.totalTime + "", style);
+        this.timerText.anchor.setTo(0.5);
+
+        this.timerGameOver = game.time.events.loop(Phaser.Timer.SECOND, function () {
+            if (this.flagFirstMouseDown) {
+                this.totalTime--;
+                this.timerText.text = this.totalTime + "";
+                if(this.totalTime <= 0)
+                {
+                    game.time.events.remove(this.timerGameOver);
+                    this.showFinalMessage("GAME OVER");
+                }
+            }
+        }, this);
     },
 
     increaseScore: function () {
@@ -79,6 +96,7 @@ GamePlayManager = {
         this.amountDiamondsCaught++;
 
         if (this.amountDiamondsCaught >= AMOUNT_DIAMONDS) {
+            game.time.events.remove(this.timerGameOver);
             this.showFinalMessage("CONGRATULATIONS");
         }
     },
@@ -97,6 +115,7 @@ GamePlayManager = {
         }
         this.textFieldFinalMsg = game.add.text(game.width / 2, game.height / 2, msg, style);
         this.textFieldFinalMsg.anchor.setTo(0.5);
+        this.endGame = true;
     },
 
     onTap: function () {
@@ -137,7 +156,7 @@ GamePlayManager = {
     },
 
     update: function () {
-        if (this.flagFirstMouseDown) {
+        if (this.flagFirstMouseDown && !this.endGame) {
             var pointerX = game.input.x;
             var pointerY = game.input.y;
 
