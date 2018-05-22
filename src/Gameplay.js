@@ -8,6 +8,7 @@ GamePlayManager = {
         game.scale.pageAlignVertically = true;
 
         this.flagFirstMouseDown = false;
+        this.amountDiamondsCaught = 0;
     },
     preload: function () {
         game.load.image("background", "assets/images/background.png");
@@ -60,6 +61,42 @@ GamePlayManager = {
             this.explosion.anchor.setTo(0.5);
             this.explosion.kill();
         }
+
+        this.currentScore = 0;
+        var style = {
+            font: "bold 30pt Arial",
+            fill: "#FFFFFF",
+            align: "center"
+        }
+
+        this.scoreText = game.add.text(game.width / 2, 40, "0", style);
+        this.scoreText.anchor.setTo(0.5);
+    },
+
+    increaseScore: function () {
+        this.currentScore += 100;
+        this.scoreText.text = this.currentScore;
+        this.amountDiamondsCaught++;
+
+        if (this.amountDiamondsCaught >= AMOUNT_DIAMONDS) {
+            this.showFinalMessage("CONGRATULATIONS");
+        }
+    },
+
+    showFinalMessage: function (msg) {
+        var bgAlpha = game.add.bitmapData(game.width, game.height);
+        bgAlpha.ctx.fillStyle = "#000000";
+        bgAlpha.ctx.fillRect(0, 0, game.width, game.height);
+        var bg = game.add.sprite(0, 0, bgAlpha);
+        bg.alpha = 0.5;
+
+        var style = {
+            font: "bold 60pt Arial",
+            fill: "#FFFFFF",
+            align: "center"
+        }
+        this.textFieldFinalMsg = game.add.text(game.width / 2, game.height / 2, msg, style);
+        this.textFieldFinalMsg.anchor.setTo(0.5);
     },
 
     onTap: function () {
@@ -121,6 +158,8 @@ GamePlayManager = {
                 var rectDiamond = this.getBoundsDiamond(this.diamonds[i]);
                 if (this.diamonds[i].visible == true && this.isRectangleOverlapping(rectHorse, rectDiamond)) {
                     this.diamonds[i].visible = false;
+                    this.increaseScore();
+
                     var explosion = this.explosionGroup.getFirstDead();
                     if (explosion != null) {
                         explosion.reset(this.diamonds[i].x, this.diamonds[i].y);
