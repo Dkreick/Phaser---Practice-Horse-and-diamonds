@@ -1,5 +1,6 @@
-Short demo game made in an Udemy course.
+## Horse and diamonds ##
 
-Pequeño juego demo hecho para un curso de Udemy.
+Short demo game made in an Udemy course. 
+I'm not the owner of the assets, this was just a practice!
 
-https://www.udemy.com/programacion-de-juegos-web-2d-en-javascript-html5-con-phaser/
+[Link to Udemy Course](https://www.udemy.com/programacion-de-juegos-web-2d-en-javascript-html5-con-phaser/)
