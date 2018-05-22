@@ -1,4 +1,5 @@
 var AMOUNT_DIAMONDS = 10;
+var AMOUNT_BOOBLES = 30;
 
 GamePlayManager = {
 
@@ -10,6 +11,7 @@ GamePlayManager = {
         this.flagFirstMouseDown = false;
         this.amountDiamondsCaught = 0;
         this.endGame = false;
+        this.countSmile = 1;
     },
     preload: function () {
         game.load.image("background", "assets/images/background.png");
@@ -17,11 +19,26 @@ GamePlayManager = {
         game.load.image("shark", "assets/images/shark.png");
         game.load.image("fishes", "assets/images/fishes.png");
         game.load.image("mollusk", "assets/images/mollusk.png");
+        game.load.image("booble1", "assets/images/booble1.png");
+        game.load.image("booble2", "assets/images/booble2.png");
         game.load.spritesheet("horse", "assets/images/horse.png", 84, 156, 2);
         game.load.spritesheet("diamonds", "assets/images/diamonds.png", 81, 84, 4);
     },
     create: function () {
         game.add.sprite(0, 0, "background");
+
+        this.boobleArray = [];
+        for (var i = 0; i < AMOUNT_BOOBLES; i++) {
+            var xBooble = game.rnd.integerInRange(1, 1140);
+            var yBooble = game.rnd.integerInRange(600, 950);
+
+            var booble = game.add.sprite(xBooble, yBooble, "booble" + game.rnd.integerInRange(1, 2));
+            booble.vel = 0.2 + game.rnd.frac() * 2;
+            booble.alpha = 0.9;
+            booble.scale.setTo(0.2 + game.rnd.frac() * 1.2);
+            this.boobleArray[i] = booble;
+        }
+        //this.booble1 = game.add.sprite(500, 150, "booble1");
         this.mollusk = game.add.sprite(500, 150, "mollusk");
         this.shark = game.add.sprite(500, 20, "shark");
         this.fishes = game.add.sprite(100, 550, "fishes");
@@ -96,6 +113,8 @@ GamePlayManager = {
     },
 
     increaseScore: function () {
+        this.countSmile = 0;
+        this.horse.frame = 1;
         this.currentScore += 100;
         this.scoreText.text = this.currentScore;
         this.amountDiamondsCaught++;
@@ -166,6 +185,22 @@ GamePlayManager = {
 
     update: function () {
         if (this.flagFirstMouseDown && !this.endGame) {
+
+            for (var i = 0; i < AMOUNT_BOOBLES; i++) {
+                var booble = this.boobleArray[i];
+                booble.y -= booble.vel;
+                if (booble.y < -50) {
+                    booble.y = 700;
+                    booble.x = game.rnd.integerInRange(1, 1140);
+                }
+            }
+            if (this.countSmile >= 0) {
+                this.countSmile++;
+                if (this.countSmile > 50) {
+                    this.countSmile = -1;
+                    this.horse.frame = 0;
+                }
+            }
             this.shark.x--;
             if (this.shark.x < -300) {
                 this.shark.x = 1300;
